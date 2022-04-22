@@ -11,6 +11,11 @@ from .serializers import TeamSerializer, HappinessLevelSerializer,\
 
 @api_view(['POST'])
 def happinessSubmit(request):
+    """
+    A member can submit daily happiness level through this
+    post endpoint. A valid token is required to submit
+    the happiness level. Level can be varied from 0 to 10.
+    """
     if 'token' not in request.data:
         return Response('token is required',
                         status=status.HTTP_400_BAD_REQUEST)
@@ -29,6 +34,7 @@ def happinessSubmit(request):
     serializer = HappinessLevelSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
+        # we just calculate the average happiness of a member here.
         avg_happiness= list(HappinessLevel.objects.filter(
             member=member).aggregate(Avg('happiness_level')).values())[0]
         member.average_happiness = avg_happiness
@@ -39,6 +45,10 @@ def happinessSubmit(request):
 
 @api_view(['GET'])
 def happinessStatistics(request):
+    """
+    Case 1: An authenticated user with valid token can see their team's
+    average happiness level and also the frequency of happiness level.
+    """
     if 'token' in request.query_params:
         member = Member.objects.filter(token=request.query_params['token']).first()
         if member:
@@ -53,6 +63,7 @@ def happinessStatistics(request):
             data = {"happiness_level": happy_meter,
                     "average_happiness_of_your_team": avg_happiness}
             return Response(data, status=status.HTTP_200_OK)
+
     avg_happiness = HappinessLevel.objects.all().aggregate(Avg('happiness_level'))
     d = {"average_happiness_across_all_teams": avg_happiness}
     return Response(d, status=status.HTTP_200_OK)
@@ -60,6 +71,9 @@ def happinessStatistics(request):
 
 @api_view(['GET'])
 def teamView(request):
+    """
+    One can view the teams in this endpoint.
+    """
     teams = Team.objects.all()
     serializer = TeamSerializer(teams, many=True)
     return Response(serializer.data)
@@ -67,6 +81,12 @@ def teamView(request):
 
 @api_view(['GET'])
 def memberView(request):
+    """
+    A member can see their information by hitting
+    this endpoint. Again a valid token is required.
+    Again a valid token is required to view one's
+    information.
+    """
     if 'token' not in request.query_params:
         return Response('valid token required', status=status.HTTP_400_BAD_REQUEST)
     member = Member.objects.filter(token=request.query_params['token']).first()

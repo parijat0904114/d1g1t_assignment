@@ -4,7 +4,6 @@ from django.db.models.signals import post_save
 from django.core.validators import MinValueValidator,\
     MaxValueValidator
 import secrets
-from django.db.models import Avg
 import datetime
 
 class Team(models.Model):
@@ -13,9 +12,9 @@ class Team(models.Model):
     def __str__(self):
         return f'{self.name}'
 
-
+# we are generating a 32 character long token for each user.
 def auth_token_generator():
-    return secrets.token_urlsafe(32)[:32]  # Return only the first 32 characters.
+    return secrets.token_urlsafe(32)[:32]
 
 
 class Member(models.Model):
@@ -32,6 +31,8 @@ class Member(models.Model):
 class HappinessLevel(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     date = models.DateField(default=datetime.date.today)
+    # happiness_level value >=0 and <=10. The value 0 indicates
+    # Unhappy/sad and value 10 indicates Extreme Happy.
     happiness_level = models.IntegerField(validators=[
         MinValueValidator(0.0), MaxValueValidator(10.0)
     ])
@@ -39,6 +40,6 @@ class HappinessLevel(models.Model):
     def __str__(self):
         return f'{self.member}-{self.date}: {self.happiness_level}'
 
-
+    # member and date are unique so members can submit once per day
     class Meta:
         unique_together = ('member', 'date')
