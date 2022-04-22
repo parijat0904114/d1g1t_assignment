@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import  api_view
 from rest_framework.response import Response
 
-from django.db.models import Avg, Count
+from django.db.models import Avg
 from .models import Team,HappinessLevel,Member
 from .serializers import TeamSerializer, HappinessLevelSerializer,\
     MemberSerializer
@@ -22,7 +22,7 @@ def happinessSubmit(request):
     else:
         member = Member.objects.filter(token=request.data['token']).first()
         if not member:
-            return Response('Token is not valid',
+            return Response('provided token is not valid',
                             status=status.HTTP_400_BAD_REQUEST)
 
         data = {"member": member.id,
@@ -58,13 +58,13 @@ def happinessStatistics(request):
                 happy_meter[i] = 0
             for m in members_of_same_team:
                 happy_meter[m.average_happiness] += 1
-            avg_happiness = HappinessLevel.objects.filter(
-                member__in=members_of_same_team).aggregate(Avg('happiness_level'))
+            avg_happiness = list(HappinessLevel.objects.filter(
+                member__in=members_of_same_team).aggregate(Avg('happiness_level')).values())[0]
             data = {"happiness_level": happy_meter,
                     "average_happiness_of_your_team": avg_happiness}
             return Response(data, status=status.HTTP_200_OK)
 
-    avg_happiness = HappinessLevel.objects.all().aggregate(Avg('happiness_level'))
+    avg_happiness = list(HappinessLevel.objects.all().aggregate(Avg('happiness_level')).values())[0]
     d = {"average_happiness_across_all_teams": avg_happiness}
     return Response(d, status=status.HTTP_200_OK)
 
@@ -72,8 +72,14 @@ def happinessStatistics(request):
 @api_view(['GET'])
 def teamView(request):
     """
-    One can view the teams in this endpoint.
+    One can view the teams in this endpoint with a valid token.
     """
+    if 'token' not in request.query_params:
+        return Response('valid token required', status=status.HTTP_400_BAD_REQUEST)
+    member = Member.objects.filter(token=request.query_params['token']).first()
+    if not member:
+        return Response('provided token is invalid', status=status.HTTP_400_BAD_REQUEST)
+
     teams = Team.objects.all()
     serializer = TeamSerializer(teams, many=True)
     return Response(serializer.data)
@@ -90,5 +96,7 @@ def memberView(request):
     if 'token' not in request.query_params:
         return Response('valid token required', status=status.HTTP_400_BAD_REQUEST)
     member = Member.objects.filter(token=request.query_params['token']).first()
+    if not member:
+        return Response('provided token is invalid', status=status.HTTP_400_BAD_REQUEST)
     serializer = MemberSerializer(member)
     return Response(serializer.data)

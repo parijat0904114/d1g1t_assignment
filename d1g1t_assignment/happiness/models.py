@@ -32,7 +32,7 @@ class HappinessLevel(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     date = models.DateField(default=datetime.date.today)
     # happiness_level value >=0 and <=10. The value 0 indicates
-    # Unhappy/sad and value 10 indicates Extreme Happy.
+    # less happy/no_reaction and value 10 indicates Extreme Happy.
     happiness_level = models.IntegerField(validators=[
         MinValueValidator(0.0), MaxValueValidator(10.0)
     ])
