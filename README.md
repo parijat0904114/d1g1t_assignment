@@ -1,5 +1,5 @@
 # d1g1t_assignment
-*Environment Setup:
+# Environment Setup:
 
 PyCharm Community Version was used to implement this project from scratch.
 Install it from here `https://www.jetbrains.com/pycharm/download/#section=linux` 
@@ -15,7 +15,7 @@ Apply all the migrations with `python manage.py migrate`.
 
 To access django admin, cd to `/PycharmProjects/d1g1t_assignment/d1g1t_assignment`. Login with your superuser credentials.
 
-*Problem Solution:
+# Solution/Algorithm:
 
 Only a superuser can create other django users and teams. A member will be created with that django user id and team id. A member will also have a token created
 which will be unique to each member and will be used for the authentication purpose. Once a member is created via django admin by the superuser. Members of
