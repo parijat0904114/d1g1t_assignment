@@ -23,8 +23,11 @@ which will be unique to each member and will be used for the authentication purp
 different teams can utilize the endpoints.
 
 We have following urls for the scenario,
-
-
+'http://localhost:8000/admin' (django admin)
+'http://localhost:8000/happiness/submit/' (POST)
+'http://localhost:8000/happiness/stat' (GET) [Allowed with or without token']
+'http://localhost:8000/happiness/member' (GET)
+'http://localhost:8000/happiness/team' (GET)
 
 
 
