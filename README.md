@@ -17,6 +17,8 @@ To access django admin, cd to `/PycharmProjects/d1g1t_assignment/d1g1t_assignmen
 
 To run unit tests, 'python manage.py test'
 
+Note that, there is no external db required to test this project. Django comes with a light weight sqlite database. We will be utilizing the db.
+
 # Solution/Algorithm:
 
 Only a superuser can create other django users and teams. A member will be created with that django user id and team id. A member will also have a token created
